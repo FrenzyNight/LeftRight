@@ -5,12 +5,12 @@ using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
-
+    
     public Sprite[] LeftRight;
-    public int MaxHp;
-    private int NowHp;
 
+    //플레이어 정보 : 체럭, 레벨
     public Text HpText;
+    public Text LevelText;
 
     List<int> TargetList = new List<int>();
 
@@ -23,6 +23,21 @@ public class GameManager : MonoBehaviour
 
     private float TimeLeft;
 
+    public Text ComboText;
+    private int combo = 0;
+
+    // 적 스폰
+    public GameObject EnemyPrefab;
+
+    private Enemy Enemy;
+
+    public Vector2 SpawnPoint;
+
+    // 공격 효과
+    public GameObject AttacEffect;
+
+    public GameObject DeathEffect;
+
     void Awake()
     {
         for(int i=0;i<6;i++)
@@ -30,12 +45,13 @@ public class GameManager : MonoBehaviour
            TargetList.Add(Random.Range(0,2));
         }
         
-        NowHp = MaxHp;
+        PlayerData.instance.PlayerNowHp = PlayerData.instance.PlayerMaxHp;
     }
     // Start is called before the first frame update
     void Start()
     {
         ListUpdate();
+        Enemy = (Instantiate(EnemyPrefab, SpawnPoint, Quaternion.identity)).GetComponent<Enemy>();
     }
 
     void Update()
@@ -45,6 +61,15 @@ public class GameManager : MonoBehaviour
         if(TimeLeft < 0)
         {
             ButtonCheck(-1);
+        }
+
+        if(Input.GetKeyDown(KeyCode.LeftArrow))
+        {
+            ButtonCheck(0);
+        }
+        else if(Input.GetKeyDown(KeyCode.RightArrow))
+        {
+            ButtonCheck(1);
         }
     }
 
@@ -59,19 +84,47 @@ public class GameManager : MonoBehaviour
 
         TimeLeft = TimeLimit;
         TimeBar.fillAmount = 1f;
-        HpText.text = "HP : " + NowHp.ToString() + " / " + MaxHp.ToString();
+        ComboText.text = combo.ToString() + " Combo!";
+        LevelText.text = "Lv. " + PlayerData.instance.PlayerLevel.ToString();
+        HpText.text = "HP : " + PlayerData.instance.PlayerNowHp.ToString() + " / " + PlayerData.instance.PlayerMaxHp.ToString();
     }
 
     public void ButtonCheck(int lr)
     {
         if(lr != TargetList[0])
         {
-            NowHp -= 10;
+            PlayerData.instance.PlayerNowHp -= Enemy.EnemyDMG;
+            GameObject effect = Instantiate(AttacEffect, PlayerData.instance.PlayerTr.position, Quaternion.identity);
+            Destroy(effect, 0.5f);
+            combo = 0;
         }
+        else
+        {
+            combo += 1;
+            Enemy.EnemyNowHp -= PlayerData.instance.PlayerDMG;
+            GameObject effect = Instantiate(AttacEffect, SpawnPoint, Quaternion.identity);
+            Destroy(effect, 0.5f);
+            if(Enemy.DeathCheck())
+            {
+                GameObject Deffect = Instantiate(DeathEffect, SpawnPoint, Quaternion.identity);
+                Destroy(Deffect, 0.5f);
+                Enemy = (Instantiate(EnemyPrefab, SpawnPoint, Quaternion.identity)).GetComponent<Enemy>();
+            }
+            PlayerData.instance.LevelUP();
+        }
+
 
         TargetList.RemoveAt(0);
         TargetList.Add(Random.Range(0,2));
 
+        
         ListUpdate();
+    }
+
+
+    void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawSphere(SpawnPoint, 0.1f);
     }
 }
