@@ -10,13 +10,14 @@ public class PlayerData : MonoBehaviour
     {
         PlayerData.instance = this;
         PlayerTr = GetComponent<Transform>();
+        animator = GetComponentInChildren<Animator>();
     }
 
     public void LevelUP()
     {
         if(PlayerNowExp >= PlayerMaxExp)
         {
-            GameObject effect = Instantiate(LevelUPEffect,gameObject.GetComponent<Transform>().position ,Quaternion.identity);
+            GameObject effect = Instantiate(LevelUPEffect, new Vector2(PlayerTr.position.x, PlayerTr.position.y + 1.5f)  ,Quaternion.identity);
             Destroy(effect,1f);
             PlayerLevel += 1;
             PlayerDMG += 3;
@@ -27,6 +28,12 @@ public class PlayerData : MonoBehaviour
         }
     }
 
+    public void AttackMotion()
+    {
+        animator.SetTrigger("Attack");
+    }
+
+    Animator animator;
     public GameObject LevelUPEffect;
 
     public Transform PlayerTr;

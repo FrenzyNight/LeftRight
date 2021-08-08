@@ -94,12 +94,13 @@ public class GameManager : MonoBehaviour
         if(lr != TargetList[0])
         {
             PlayerData.instance.PlayerNowHp -= Enemy.EnemyDMG;
-            GameObject effect = Instantiate(AttacEffect, PlayerData.instance.PlayerTr.position, Quaternion.identity);
+            GameObject effect = Instantiate(AttacEffect, new Vector2(PlayerData.instance.PlayerTr.position.x, PlayerData.instance.PlayerTr.position.y + 1f), Quaternion.identity);
             Destroy(effect, 0.5f);
             combo = 0;
         }
         else
         {
+            PlayerData.instance.AttackMotion();
             combo += 1;
             Enemy.EnemyNowHp -= PlayerData.instance.PlayerDMG;
             GameObject effect = Instantiate(AttacEffect, SpawnPoint, Quaternion.identity);
