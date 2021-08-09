@@ -38,7 +38,36 @@ public class GameManager : MonoBehaviour
 
     public GameObject DeathEffect;
 
-    void Awake()
+    private bool isStart = false;
+
+    // 메뉴 관리
+    public Text MoneyText;
+
+    public GameObject DeathPanel;
+
+    void Update()
+    {
+        if(isStart)
+        {
+            TimeBar.fillAmount = TimeLeft / TimeLimit;
+            TimeLeft -= Time.deltaTime;
+            if(TimeLeft < 0)
+            {
+                ButtonCheck(-1);
+            }
+
+            if(Input.GetKeyDown(KeyCode.LeftArrow))
+            {
+                ButtonCheck(0);
+            }
+            else if(Input.GetKeyDown(KeyCode.RightArrow))
+            {
+                ButtonCheck(1);
+            }
+        }
+    }
+
+    public void GameStart()
     {
         for(int i=0;i<6;i++)
         {
@@ -46,31 +75,10 @@ public class GameManager : MonoBehaviour
         }
         
         PlayerData.instance.PlayerNowHp = PlayerData.instance.PlayerMaxHp;
-    }
-    // Start is called before the first frame update
-    void Start()
-    {
+        PlayerData.instance.IdleMotion();
         ListUpdate();
         Enemy = (Instantiate(EnemyPrefab, SpawnPoint, Quaternion.identity)).GetComponent<Enemy>();
-    }
-
-    void Update()
-    {
-        TimeBar.fillAmount = TimeLeft / TimeLimit;
-        TimeLeft -= Time.deltaTime;
-        if(TimeLeft < 0)
-        {
-            ButtonCheck(-1);
-        }
-
-        if(Input.GetKeyDown(KeyCode.LeftArrow))
-        {
-            ButtonCheck(0);
-        }
-        else if(Input.GetKeyDown(KeyCode.RightArrow))
-        {
-            ButtonCheck(1);
-        }
+        isStart = true;
     }
 
     void ListUpdate()
@@ -84,6 +92,7 @@ public class GameManager : MonoBehaviour
 
         TimeLeft = TimeLimit;
         TimeBar.fillAmount = 1f;
+        MoneyText.text = DataManager.Instance.money.ToString("n0");
         ComboText.text = combo.ToString() + " Combo!";
         LevelText.text = "Lv. " + PlayerData.instance.PlayerLevel.ToString();
         HpText.text = "HP : " + PlayerData.instance.PlayerNowHp.ToString() + " / " + PlayerData.instance.PlayerMaxHp.ToString();
@@ -97,6 +106,12 @@ public class GameManager : MonoBehaviour
             GameObject effect = Instantiate(AttacEffect, new Vector2(PlayerData.instance.PlayerTr.position.x, PlayerData.instance.PlayerTr.position.y + 1f), Quaternion.identity);
             Destroy(effect, 0.5f);
             combo = 0;
+
+            if(PlayerData.instance.DieCheck())
+            {
+                isStart = false;
+                DeathPanel.SetActive(true);
+            }
         }
         else
         {

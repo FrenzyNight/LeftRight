@@ -11,6 +11,7 @@ public class PlayerData : MonoBehaviour
         PlayerData.instance = this;
         PlayerTr = GetComponent<Transform>();
         animator = GetComponentInChildren<Animator>();
+        WorkMotion();
     }
 
     public void LevelUP()
@@ -28,9 +29,36 @@ public class PlayerData : MonoBehaviour
         }
     }
 
+    public bool DieCheck()
+    {
+        if(PlayerNowHp <= 0)
+        {
+            DeathMotion();
+
+            return true;
+        }
+
+        return false;
+    }
+
     public void AttackMotion()
     {
         animator.SetTrigger("Attack");
+    }
+
+    public void WorkMotion()
+    {
+        animator.SetFloat("RunState", 0.2f);
+    }
+
+    public void IdleMotion()
+    {
+        animator.SetFloat("RunState", 0);
+    }
+
+    public void DeathMotion()
+    {
+        animator.SetTrigger("Die");
     }
 
     Animator animator;

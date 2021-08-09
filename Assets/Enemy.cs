@@ -37,6 +37,7 @@ public class Enemy : MonoBehaviour
         {
             EnemyHpText.text = "";
             PlayerData.instance.PlayerNowExp += 10;
+            DataManager.Instance.money += 10;
             Destroy(gameObject);
 
             return true;
