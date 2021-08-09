@@ -11,9 +11,8 @@ public class DataManager : MonoBehaviour
         if(Instance == null)
         {
             Instance = this;
+            DontDestroyOnLoad(this.gameObject);
         }
-
-        DontDestroyOnLoad(this.gameObject);
     }
 
     public int money;

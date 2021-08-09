@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -45,6 +46,11 @@ public class GameManager : MonoBehaviour
 
     public GameObject DeathPanel;
 
+
+    void Start()
+    {
+        MoneyText.text = DataManager.Instance.money.ToString("n0");
+    }
     void Update()
     {
         if(isStart)
@@ -130,6 +136,7 @@ public class GameManager : MonoBehaviour
         }
 
 
+        TimeLimit -= 0.01f;
         TargetList.RemoveAt(0);
         TargetList.Add(Random.Range(0,2));
 
@@ -137,6 +144,10 @@ public class GameManager : MonoBehaviour
         ListUpdate();
     }
 
+    public void Restart()
+    {
+        SceneManager.LoadScene("Main");
+    }
 
     void OnDrawGizmos()
     {
